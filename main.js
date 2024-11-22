@@ -1,38 +1,140 @@
-// Current state
-var currentState = "";
+
+
+
+/**
+ * ChatGPT gerði þessa function fyrir mig sem tekur á móti json objecti og býr til html file frá því
+ * @param {} jsonData 
+ */
+// Function to create HTML from the JSON object
+function createHTMLFromJSON(jsonData) {
+  // Create the HTML structure
+
+
+  // 1. Create the title
+  const titleElement = document.createElement('h1');
+  titleElement.textContent = jsonData.title;
+  document.title = jsonData.title;
+
+  // 2. Create the description text
+  const textElement = document.createElement('p');
+  textElement.textContent = jsonData.text;
+
+  // 3. Create the category
+  const categoryElement = document.createElement('p');
+  categoryElement.textContent = `Category: ${jsonData.category}`;
+
+  // Append the title, text, and category to the body or a specific container
+  const container = document.createElement('div');
+  container.appendChild(titleElement);
+  container.appendChild(textElement);
+  container.appendChild(categoryElement);
+
+  // 4. Loop through the content array and create elements based on its type
+  jsonData.content.forEach(item => {
+    // Create a section for each content item
+    const contentSection = document.createElement('section');
+    const contentTitle = document.createElement('h2');
+    contentTitle.textContent = item.title;
+    const contentText = document.createElement('p');
+    contentText.textContent = item.text;
+
+    // Append each section to the container
+    contentSection.appendChild(contentTitle);
+    contentSection.appendChild(contentText);
+
+    // You can also add a link for the url if needed
+    const contentLink = document.createElement('a');
+    contentLink.href = item.url;
+    contentLink.textContent = `Learn more about ${item.title}`;
+    contentSection.appendChild(contentLink);
+
+    container.appendChild(contentSection);
+  });
+
+  // Append everything to the body or a specific element in the DOM
+  var efniElement = document.getElementById('efni');
+  efniElement.appendChild(container);
+}
+
 
 function htmlListener() {
-  var h = document.createElement("h1");
-  h.textContent = "html";
-  document.body.appendChild(h);
+  var efniElement = document.getElementById('efni');
 
-  const s = currentState;
-  window.history.pushState({s},"html","./htmlEfni");
-  currentState = "html";
+  // Fjarlæga öll börn af efni
+  while (efniElement.firstChild) {
+    efniElement.removeChild(efniElement.firstChild);
+  }
+
+  // Setja inn html-börn í efni
+  fetch('data/html/index.json').then(response => response.json()).then(dataHtml => {
+    createHTMLFromJSON(dataHtml);
+  });
 }
 
 function cssListener() {
-  var h = document.createElement("h1");
-  h.textContent = "css";
-  document.body.appendChild(h);
+  var efniElement = document.getElementById('efni');
 
-  const s = currentState;
-  window.history.pushState({s},"css","./cssEfni");
-  currentState = "css";
+  // Fjarlæga öll börn af efni
+  while (efniElement.firstChild) {
+    efniElement.removeChild(efniElement.firstChild);
+  }
+
+  // Setja inn html-börn í efni
+  fetch('data/css/index.json').then(response => response.json()).then(dataCss => {
+    createHTMLFromJSON(dataCss);
+  });
 }
 
 function jsListener() {
-  var h = document.createElement("h1");
-  h.textContent = "js";
-  document.body.appendChild(h);
+  var efniElement = document.getElementById('efni');
 
-  const s = currentState;
-  window.history.pushState({s},"js","./jsEfni");
-  currentState = "js";
+  // Fjarlæga öll börn af efni
+  while (efniElement.firstChild) {
+    efniElement.removeChild(efniElement.firstChild);
+  }
+
+  // Setja inn html-börn í efni
+  fetch('data/js/index.json').then(response => response.json()).then(dataJs => {
+    createHTMLFromJSON(dataJs);
+  });
+}
+
+function forsidaListener() {
+  var efniElement = document.getElementById('efni');
+
+  // Fjarlæga öll börn af efni
+  while (efniElement.firstChild) {
+    efniElement.removeChild(efniElement.firstChild);
+  }
+
+  // Setja inn html-börn í efni
+  fetch('data/index.json').then(response => response.json()).then(data => {
+    document.title = data.title;
+  });
+}
+
+function htmlFunc() {
+  window.history.pushState({ pageTitle: 'HTML' },"HTML","./htmlEfni");
+  htmlListener();
+}
+
+function cssFunc() {
+  window.history.pushState({ pageTitle: 'CSS' },"CSS","./cssEfni");
+  cssListener();
+}
+
+function jsFunc() {
+  window.history.pushState({ pageTitle: 'JavaScript' },"JavaScript","./jsEfni");
+  jsListener();
+}
+
+function forsidaFunc() {
+  window.history.pushState({ pageTitle: 'Vefforritunarvefurinn' },"Vefforritunarvefurinn","./forsida");
+  forsidaListener();
 }
 
 
-function forsida() {
+function upphaf() {
   // Búa til forsíðu í byrjun
   fetch('data/index.json').then(response => response.json()).then(data => {
     // Titill
@@ -64,9 +166,9 @@ function forsida() {
     nav.appendChild(jsChild);
 
     // Setja virkni á takka
-    htmlChild.addEventListener('click',htmlListener);
-    cssChild.addEventListener('click',cssListener);
-    jsChild.addEventListener('click',jsListener);
+    htmlChild.addEventListener('click',htmlFunc);
+    cssChild.addEventListener('click',cssFunc);
+    jsChild.addEventListener('click',jsFunc);
 
     // Appenda nav í body
     document.body.appendChild(nav);
@@ -77,18 +179,32 @@ function forsida() {
     footerA.textContent = data.footer;
     footerE.appendChild(footerA); 
 
+    // Appenda div sem heldur utan um hvaða efni er sýnt hverju sinni
+    var efni = document.createElement('div');
+    var efniId = document.createAttribute('id');
+    efniId.value = 'efni';
+    efni.setAttributeNode(efniId);
+    document.body.appendChild(efni);
+
     // Pusha forsíðu
-    window.history.pushState(null,null,"./forsida");
-    currentState = "forsida";
+    var s = "forsida";
+    window.history.pushState({ pageTitle: 'Vefforritunarvefurinn' },"Vefforritunarvefurinn","./forsida");
   });
 };
 
   window.addEventListener('popstate', e => {
-    var g = e.state.s;
-    var h = document.createElement("h1");
-    h.textContent = g;
-    document.body.appendChild(h);
+    var a = e.state ? e.state.pageTitle : null;
+
+    if (a == 'HTML') {
+      htmlListener();
+    } else if (a == 'CSS') {
+      cssListener();
+    } else if (a == 'JavaScript') {
+      jsListener();
+    } else if (a == 'Vefforritunarvefurinn') {
+      forsidaListener();
+    }
   });
 
-  // Serve forida í byrjun
-  forsida();
+  // Serve forsida í byrjun
+  upphaf();
