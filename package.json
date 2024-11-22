@@ -1,0 +1,16 @@
+{
+  "name": "h2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "sass": "sass --watch main.scss main.css",
+    "browser-sync": "browser-sync start --server --files 'index.html, main.css'",
+    "dev": "npm-run-all --parallel sass browser-sync"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "eslint": "^9.15.0"
+  }
+}
